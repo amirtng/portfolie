@@ -488,6 +488,44 @@
       .title-card { max-height: calc(100dvh - 2rem); overflow: auto; }
       .overlay-card { max-height: 88dvh; }
     }
+
+    @media (max-width: 720px) {
+      .glass { padding: .7rem .85rem; }
+      .brand-title { font-size: 1.1rem; }
+      .hud { display: grid; grid-template-columns: 1fr; gap: .45rem; width: 100%; }
+      .pill { text-align: center; }
+      .status-row { display: grid; grid-template-columns: 1fr; gap: .6rem; }
+      .shell { gap: 1rem; }
+      .speaker { font-size: .72rem; }
+      .dialogue-box { border-radius: 1rem; }
+      .text { font-size: 1rem; }
+      .choice-list.visible { gap: .75rem; }
+      .choice-btn { min-height: 94px; }
+      .panel { padding: .9rem; border-radius: 1rem; }
+      .quick-grid { grid-template-columns: 1fr 1fr; gap: .6rem; }
+      .ui-btn, .choice-btn, .chapter-btn, .menu-btn, .close-btn, .enter-btn { min-height: 52px; }
+      .footer { padding-bottom: 1rem; }
+    }
+
+    @media (max-width: 520px) {
+      .topbar { position: relative; inset: auto; }
+      .content { justify-content: flex-start; padding-top: .5rem; }
+      .stage { gap: .85rem; }
+      .status-row { padding-inline: 0; }
+      .scene-small { width: 100%; text-align: left; }
+      .button-row { grid-template-columns: 1fr 1fr; }
+      .button-row .ui-btn:nth-child(3),
+      .button-row .ui-btn:nth-child(4) { grid-column: span 1; }
+      .side { gap: .85rem; }
+      .panel-title { margin-bottom: .65rem; }
+      .overlay { align-items: flex-end; padding: .5rem; }
+      .overlay-card { width: 100%; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+      .title-actions { grid-template-columns: 1fr; }
+      .title-card { text-align: left; }
+      .subtitle { margin-inline: 0; }
+      .footer { font-size: .74rem; }
+    }
+
   </style>
 </head>
 <body>
