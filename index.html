@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Echo der Entscheidung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.2rem);
+      --space-2: .5rem;
+      --space-3: .75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+      --radius-md: .8rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.3rem;
+      --color-bg: #070910;
+      --color-surface: rgba(10, 13, 20, 0.76);
+      --color-surface-2: rgba(16, 20, 30, 0.9);
+      --color-border: rgba(255,255,255,0.12);
+      --color-text: #f4f6fb;
+      --color-muted: #bdc6d9;
+      --color-faint: #8f97aa;
+      --color-primary: #8cb7ff;
+      --color-accent: #ffe19c;
+      --shadow-lg: 0 20px 60px rgba(0,0,0,.45);
+      --shadow-md: 0 10px 30px rgba(0,0,0,.28);
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Inter', sans-serif;
+      --transition: 180ms cubic-bezier(.16,1,.3,1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      overflow: hidden;
+    }
+
+    button, input { font: inherit; }
+    button {
+      cursor: pointer;
+      border: 0;
+      transition: transform var(--transition), background var(--transition), border-color var(--transition), opacity var(--transition);
+    }
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(1px) scale(.99); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .app {
+      position: relative;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: #05070c;
+    }
+
+    .bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.03);
+      opacity: 0;
+      transition: opacity .75s ease, transform 1.3s ease;
+    }
+    .bg.active { opacity: 1; transform: scale(1); }
+
+    .overlay-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(6,8,12,.18) 0%, rgba(6,8,12,.34) 40%, rgba(6,8,12,.8) 100%),
+        radial-gradient(circle at 18% 15%, rgba(140,183,255,.16), transparent 28%),
+        radial-gradient(circle at 82% 16%, rgba(255,225,156,.08), transparent 26%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: absolute;
+      inset: 0 0 auto 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+
+    .glass {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: .8rem 1rem;
+      border-radius: 999px;
+      background: rgba(9, 12, 18, .56);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      letter-spacing: .03em;
+    }
+
+    .logo {
+      width: 28px;
+      height: 28px;
+      color: var(--color-accent);
+      flex: none;
+    }
+
+    .hud {
+      color: var(--color-muted);
+      font-size: var(--text-sm);
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: .35rem .75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+
+    .title-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-5);
+      background: linear-gradient(180deg, rgba(5,7,11,.34), rgba(5,7,11,.74));
+      backdrop-filter: blur(4px);
+      transition: opacity .35s ease, visibility .35s ease;
+    }
+    .title-screen.hidden { opacity: 0; visibility: hidden; }
+
+    .title-card {
+      width: min(840px, 100%);
+      background: rgba(10, 13, 20, .74);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: clamp(1.4rem, 3vw, 2.8rem);
+      text-align: center;
+      backdrop-filter: blur(18px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: .5rem .9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--color-muted);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 5.8rem);
+      line-height: .92;
+      margin-bottom: var(--space-4);
+    }
+
+    .subtitle {
+      color: var(--color-muted);
+      line-height: 1.75;
+      font-size: var(--text-base);
+      max-width: 46ch;
+      margin: 0 auto var(--space-6);
+    }
+
+    .title-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .menu-btn,
+    .ui-btn,
+    .choice-btn,
+    .chapter-btn,
+    .close-btn {
+      min-height: 46px;
+      padding: .9rem 1rem;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      color: var(--color-text);
+    }
+
+    .menu-btn.primary,
+    .ui-btn.primary {
+      background: linear-gradient(135deg, var(--color-accent), #fff1c8);
+      color: #10131a;
+      border-color: transparent;
+      font-weight: 800;
+    }
+
+    .content {
+      position: relative;
+      z-index: 4;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-5);
+    }
+
+    .stage {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      align-items: center;
+      color: var(--color-faint);
+      font-size: var(--text-sm);
+      padding-inline: .2rem;
+    }
+
+    .meter {
+      display: flex;
+      gap: .4rem;
+      flex-wrap: wrap;
+    }
+    .meter span {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .meter span.active { background: var(--color-primary); box-shadow: 0 0 12px rgba(140,183,255,.45); }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 270px;
+      gap: var(--space-4);
+      align-items: end;
+    }
+
+    .dialogue-col {
+      display: grid;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    .speaker {
+      justify-self: start;
+      padding: .65rem 1rem;
+      border-radius: 999px;
+      background: rgba(10, 12, 18, .84);
+      border: 1px solid rgba(255,255,255,.11);
+      color: var(--color-accent);
+      font-weight: 800;
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      box-shadow: var(--shadow-md);
+    }
+
+    .dialogue-box {
+      background: rgba(9, 12, 18, .82);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-xl);
+      padding: clamp(1rem, 2vw, 1.4rem);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px);
+    }
+
+    .text {
+      min-height: 6em;
+      line-height: 1.9;
+      font-size: clamp(1.04rem, .95rem + .42vw, 1.24rem);
+      max-width: 72ch;
+      white-space: pre-line;
+    }
+
+    .meta {
+      margin-top: var(--space-5);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-3);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .scene-small {
+      color: var(--color-faint);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: var(--text-xs);
+    }
+
+    .button-row,
+    .quick-grid,
+    .choice-list {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .button-row .ui-btn { min-width: 110px; }
+
+    .side {
+      display: grid;
+      gap: var(--space-3);
+      align-content: end;
+    }
+
+    .panel {
+      background: rgba(10, 13, 20, .74);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px);
+      padding: var(--space-4);
+    }
+
+    .panel-title {
+      color: var(--color-faint);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: var(--text-xs);
+      margin-bottom: var(--space-3);
+    }
+
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; }
+
+    .choice-list {
+      display: none;
+      flex-direction: column;
+    }
+    .choice-list.visible { display: flex; }
+
+    .choice-btn {
+      text-align: left;
+      min-height: 82px;
+      background: rgba(255,255,255,.05);
+    }
+    .choice-btn strong { display: block; color: var(--color-accent); margin-bottom: .35rem; }
+    .choice-btn span { color: var(--color-muted); line-height: 1.6; font-size: var(--text-sm); }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-5);
+      background: rgba(4,6,10,.58);
+      backdrop-filter: blur(10px);
+    }
+    .overlay.visible { display: flex; }
+
+    .overlay-card {
+      width: min(760px, 100%);
+      max-height: 82dvh;
+      overflow: auto;
+      background: rgba(10, 13, 20, .9);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .overlay-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .overlay-top h2 {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+    }
+
+    .log-list,
+    .chapter-list { display: grid; gap: var(--space-3); }
+
+    .log-item,
+    .chapter-btn {
+      padding: .95rem 1rem;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--color-text);
+      text-align: left;
+    }
+
+    .log-item strong,
+    .chapter-btn strong {
+      display: block;
+      color: var(--color-accent);
+      margin-bottom: .25rem;
+      font-size: var(--text-sm);
+    }
+
+    .log-item p,
+    .chapter-btn span {
+      color: var(--color-muted);
+      font-size: var(--text-sm);
+      line-height: 1.7;
+    }
+
+    .toast {
+      position: absolute;
+      right: var(--space-5);
+      bottom: calc(var(--space-5) + 290px);
+      z-index: 25;
+      max-width: 340px;
+      padding: .95rem 1rem;
+      border-radius: var(--radius-lg);
+      background: rgba(12, 15, 22, .92);
+      border: 1px solid rgba(255,225,156,.22);
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none;
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+
+    .footer {
+      width: min(1180px, 100%);
+      margin: .2rem auto 0;
+      color: rgba(255,255,255,.58);
+      font-size: var(--text-xs);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      padding-inline: .2rem;
+    }
+
+    @media (max-width: 980px) {
+      .shell { grid-template-columns: 1fr; }
+      .side { grid-template-columns: 1fr 1fr; display: grid; }
+      .toast { bottom: var(--space-5); }
+    }
+
+    @media (max-width: 720px) {
+      .topbar, .content { padding: var(--space-4); }
+      .side { grid-template-columns: 1fr; }
+      .button-row .ui-btn, .quick-grid .ui-btn { flex: 1 1 auto; }
+      .quick-grid { grid-template-columns: 1fr 1fr; }
+      .toast { left: var(--space-4); right: var(--space-4); max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div id="bgA" class="bg active"></div>
+    <div id="bgB" class="bg"></div>
+    <div class="overlay-bg"></div>
+
+    <header class="topbar">
+      <div class="glass">
+        <svg class="logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M13 17.5C13 14.4624 15.4624 12 18.5 12H45.5C48.5376 12 51 14.4624 51 17.5V34.2023C51 36.0076 50.1128 37.6974 48.6274 38.7248L33.8751 48.9294C32.7427 49.7127 31.2573 49.7127 30.1249 48.9294L15.3726 38.7248C13.8872 37.6974 13 36.0076 13 34.2023V17.5Z" stroke="currentColor" stroke-width="3"/>
+          <path d="M23 24H41" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <path d="M23 31H36" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div class="brand-title">Echo der Entscheidung</div>
+      </div>
+      <div class="glass hud">
+        <span class="pill" id="scenePill">Szene 1</span>
+        <span class="pill" id="routePill">Route: Unbestimmt</span>
+        <span class="pill" id="secretPill">Geheimnisse: 0/3</span>
+      </div>
+    </header>
+
+    <section class="title-screen" id="titleScreen">
+      <div class="title-card">
+        <div class="eyebrow">Professionelle HTML Visual Novel</div>
+        <h1>Echo der Entscheidung</h1>
+        <p class="subtitle">Mystery, Schuldrama, Entscheidungen mit Folgen. Diese Version ist technisch stabiler aufgebaut: klare Zustände, funktionierende Buttons, Kapitelwahl, Dialog-Log, Zurück-Funktion und kleine Easter Eggs.</p>
+        <div class="title-actions">
+          <button class="menu-btn primary" id="startBtn">Spiel starten</button>
+          <button class="menu-btn" id="openChaptersIntroBtn">Kapitel wählen</button>
+          <button class="menu-btn" id="openLogIntroBtn">Dialog-Log</button>
+          <button class="menu-btn" id="restartIntroBtn">Neu starten</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="content">
+      <div class="stage">
+        <div class="status-row">
+          <div id="sceneTitle">Szene 1 — Intro</div>
+          <div class="meter" id="progressMeter"></div>
+        </div>
+
+        <div class="shell">
+          <section class="dialogue-col">
+            <div class="speaker" id="speaker">Erzähler</div>
+            <div class="dialogue-box">
+              <div class="text" id="text"></div>
+              <div class="meta">
+                <div class="button-row">
+                  <button class="ui-btn" id="backBtn">← Zurück</button>
+                  <button class="ui-btn primary" id="nextBtn">Weiter →</button>
+                  <button class="ui-btn" id="openLogBtn">Log</button>
+                  <button class="ui-btn" id="openChaptersBtn">Kapitel</button>
+                </div>
+                <div class="scene-small" id="endingText">Noch ist nichts entschieden.</div>
+              </div>
+            </div>
+            <div class="choice-list" id="choices"></div>
+          </section>
+
+          <aside class="side">
+            <div class="panel">
+              <div class="panel-title">Navigation</div>
+              <div class="quick-grid">
+                <button class="ui-btn" id="restartBtn">Neu starten</button>
+                <button class="ui-btn" id="routeBtn">Route</button>
+                <button class="ui-btn" id="secretBtn">?</button>
+                <button class="ui-btn" id="revealBtn">Geheimcode</button>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">Code-Eingabe</div>
+              <div style="display:grid;gap:var(--space-3)">
+                <input id="codeInput" type="text" placeholder="ECHO, WAHRHEIT, MIRA" style="min-height:44px;padding:.8rem .9rem;border-radius:var(--radius-md);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--color-text);outline:none;" />
+                <button class="ui-btn" id="enterCodeBtn">Code eingeben</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Leertaste/Enter = Weiter, Backspace = Zurück, L = Log, K = Kapitel, R = Neustart.</span>
+        <span>Bilder: ab.png bis hs.png im selben Ordner wie diese Datei.</span>
+      </div>
+    </main>
+
+    <div class="overlay" id="logOverlay">
+      <div class="overlay-card">
+        <div class="overlay-top">
+          <h2>Dialog-Log</h2>
+          <button class="close-btn" data-close="logOverlay">×</button>
+        </div>
+        <div class="log-list" id="logList"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="chapterOverlay">
+      <div class="overlay-card">
+        <div class="overlay-top">
+          <h2>Kapitelwahl</h2>
+          <button class="close-btn" data-close="chapterOverlay">×</button>
+        </div>
+        <div class="chapter-list" id="chapterList"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    const imageMap = {1:'ab.png',2:'cd.png',3:'if.png',4:'dog.png',5:'nih.png',6:'che.png',7:'po.png',8:'hk.png',9:'pash.png',10:'lo.png',11:'vash.png',12:'hs.png'};
+
+    const scenes = {
+      s1: {
+        image: 1, progress: 1, title: 'Szene 1 — Intro',
+        lines: [
+          ['Erzähler','Der Schultag beginnt wie jeder andere — Stimmen im Raum, Sonnenlicht auf Tischen, Schritte im Flur. Und trotzdem fühlt sich etwas unsichtbar falsch an.'],
+          ['Alex','Warum wirkt heute alles so normal ... und gleichzeitig komplett daneben?'],
+          ['Erzähler','Als Alex den Laptop öffnet, erscheint eine Nachricht ohne Absender. Kein Betreff. Keine Begrüßung. Nur eine einzige Aufforderung.'],
+          ['Laptop','Wenn du die Wahrheit wissen willst, triff mich nach der Schule im Computerraum.']
+        ],
+        choices: [
+          { label: 'A — Nachricht ignorieren', hint: 'Du tust so, als wäre nichts passiert.', target: 's2_ignore', effect: s => {} },
+          { label: 'B — Hingehen', hint: 'Du willst wissen, wer hinter allem steckt.', target: 's2_go', effect: s => {} }
+        ]
+      },
+      s2_go: {
+        image: 4, progress: 2, title: 'Szene 2 — Computerraum',
+        lines: [
+          ['Erzähler','Nach Schulschluss leert sich die Schule langsam. Doch sie ist nicht tot: Irgendwo fällt eine Tür ins Schloss, irgendwo brennt noch Licht.'],
+          ['Alex','Wenn mich jemand herlocken wollte, dann sollte er jetzt besser einen guten Grund haben.'],
+          ['Erzähler','Die Tür zum Computerraum steht offen. Kein Mensch ist da. Nur kaltes Monitorlicht — und etwas Kleines auf dem Tisch.']
+        ],
+        next: 's3_usb'
+      },
+      s2_ignore: {
+        image: 2, progress: 2, title: 'Szene 2 — Ignoriert',
+        lines: [
+          ['Erzähler','Alex klappt den Laptop zu, aber die Nachricht bleibt in seinem Kopf. Normal weiterzumachen fühlt sich plötzlich falsch an.'],
+          ['Mira','Du siehst so aus, als hättest du gerade etwas gelesen, das du lieber nicht gelesen hättest.'],
+          ['Alex','Vielleicht.'],
+          ['Erzähler','Später führt genau dieses Gefühl ihn doch in den Computerraum.']
+        ],
+        next: 's3_friend'
+      },
+      s3_usb: {
+        image: 5, progress: 3, title: 'Szene 3 — POV: USB-Fund',
+        lines: [
+          ['Erzähler','Aus Alex’ Sicht liegt der USB-Stick direkt vor dem PC. Tastatur, Tischkante, kaltes Licht — alles wird still.'],
+          ['Alex','Das hier ist keine Warnung. Das ist ein Test.'],
+          ['Erzähler','Die Daten darauf zeigen manipulierte Noten, verschwundene Einträge und interne Dokumente der Schule.']
+        ],
+        next: 's4_choice'
+      },
+      s3_friend: {
+        image: 5, progress: 3, title: 'Szene 3 — Doch hingesehen',
+        lines: [
+          ['Erzähler','Später am Abend steht Alex trotzdem im Computerraum. Auf dem Tisch liegt derselbe USB-Stick, als hätte die Schule selbst auf ihn gewartet.'],
+          ['Alex','Dann wollte die Nachricht nur Zeit gewinnen.'],
+          ['Erzähler','Die Daten darauf sind schlimmer, als Alex erwartet hat.']
+        ],
+        next: 's4_choice'
+      },
+      s4_choice: {
+        image: 5, progress: 4, title: 'Szene 4 — Erste Entscheidung',
+        lines: [
+          ['Erzähler','Noten wurden verändert. Vermerke gelöscht. Menschen begünstigt. Andere benachteiligt. Das hier ist kein Ausrutscher.'],
+          ['Alex','Wenn ich jetzt dem Falschen vertraue, verschwindet alles.']
+        ],
+        choices: [
+          { label: 'A — Direktor informieren', hint: 'Du suchst den offiziellen Weg.', target: 's5_director', effect: s => { s.trust = 'direktor'; } },
+          { label: 'B — Mit Mira reden', hint: 'Du testest private Loyalität zuerst.', target: 's5_mira', effect: s => { s.trust = 'mira'; } }
+        ]
+      },
+      s5_director: {
+        image: 7, progress: 5, title: 'Szene 5 — Das Büro',
+        lines: [
+          ['Brenner','Das sind ernste Vorwürfe. Vorwürfe, mit denen man vorsichtig sein sollte.'],
+          ['Alex','Sie klingen für mich eher nach Fakten als nach Vorwürfen.'],
+          ['Erzähler','Brenner bleibt glatt, präzise und fast zu ruhig. Keine Überraschung. Kein Zorn. Nur Kontrolle.']
+        ],
+        next: 's6_suspicion'
+      },
+      s5_mira: {
+        image: 3, progress: 5, title: 'Szene 5 — Mira weicht aus',
+        lines: [
+          ['Mira','Nicht alles ist so einfach, wie es aussieht.'],
+          ['Alex','Dann mach es einfach und sag mir die Wahrheit.'],
+          ['Erzähler','Mira sagt nicht direkt die Unwahrheit. Aber sie schützt etwas — oder jemanden.']
+        ],
+        next: 's6_suspicion'
+      },
+      s6_suspicion: {
+        image: 6, progress: 6, title: 'Szene 6 — Verdacht',
+        lines: [
+          ['Erzähler','Im Treppenhaus verdichtet sich alles auf zwei Namen: Mira oder Brenner.'],
+          ['Alex','Ich brauche keine Vermutungen mehr. Ich brauche Beweise.']
+        ],
+        choices: [
+          { label: 'A — Nach Beweisen suchen', hint: 'Leise, heimlich, präzise.', target: 's7_search', effect: s => { s.searched = true; } },
+          { label: 'B — Direkt konfrontieren', hint: 'Druck erzeugt Fehler.', target: 's7_confront', effect: s => { s.confronted = true; } }
+        ]
+      },
+      s7_search: {
+        image: 9, progress: 7, title: 'Szene 7 — Versteckte Akten',
+        lines: [
+          ['Erzähler','Zwischen staubigen Ordnern und vergessenen Regalen findet Alex Dokumente, die nie offen hätten herumliegen dürfen.'],
+          ['Alex','Das ist größer als eine einzelne manipulierte Note.'],
+          ['Erzähler','Ein Name taucht mehrfach auf. Daneben ein zweiter Name, der geschützt wurde.']
+        ],
+        next: 's8_truth'
+      },
+      s7_confront: {
+        image: 8, progress: 7, title: 'Szene 7 — Druck',
+        lines: [
+          ['Alex','Ich sage das nur einmal: Jemand manipuliert diese Schule. Und ich höre nicht auf, bis ich den Anfang finde.'],
+          [() => state.trust === 'mira' ? 'Mira' : 'Brenner', () => state.trust === 'mira' ? 'Dann bist du näher dran, als gut für dich ist.' : 'Manche Wahrheiten zerstören mehr, als sie retten.'],
+          ['Erzähler','Nicht die Worte verraten Angst — das Schweigen direkt danach tut es.']
+        ],
+        next: 's8_truth'
+      },
+      s8_truth: {
+        image: 10, progress: 8, title: 'Szene 8 — Die Struktur',
+        lines: [
+          ['Erzähler','Ein Fehler wurde vertuscht. Dann ein Vorteil erzeugt. Dann ein System gebaut, damit niemand den Anfang sauber beweisen kann.'],
+          ['Alex','Es geht längst nicht mehr nur um eine Person.'],
+          ['Erzähler','Jetzt muss Alex entscheiden, wen er in die Enge treibt.']
+        ],
+        choices: [
+          { label: 'A — Mira unter Druck setzen', hint: 'Sie verbirgt zu viel.', target: 's9_mira', effect: s => { s.suspicion = 'mira'; } },
+          { label: 'B — Brenner entlarven', hint: 'Die Spitze des Systems zuerst.', target: 's9_brenner', effect: s => { s.suspicion = 'brenner'; } }
+        ]
+      },
+      s9_mira: {
+        image: 11, progress: 9, title: 'Szene 9 — Mira gesteht',
+        lines: [
+          ['Mira','Ich wollte nur einen Fehler korrigieren. Dann haben andere gemerkt, was möglich ist.'],
+          ['Alex','Und irgendwann warst du Teil von etwas, das du nicht mehr stoppen konntest.'],
+          ['Erzähler','Mira ist nicht der Ursprung. Aber sie war Teil der Kette.']
+        ],
+        next: 's10_final'
+      },
+      s9_brenner: {
+        image: 7, progress: 9, title: 'Szene 9 — Brenner kippt',
+        lines: [
+          ['Brenner','Ordnung ist oft nur die Kunst, zu entscheiden, welche Wahrheit überlebt.'],
+          ['Alex','Ordnung ohne Gerechtigkeit ist nur sauberes Schweigen.'],
+          ['Erzähler','Mit den richtigen Dokumenten verliert Brenner zum ersten Mal die Ruhe, die ihn bis hierher geschützt hat.']
+        ],
+        next: 's10_final'
+      },
+      s10_final: {
+        image: 11, progress: 10, title: 'Szene 10 — Letzte Entscheidung',
+        lines: [
+          ['Erzähler','Die Wahrheit liegt offen genug da, um sie zu veröffentlichen. Aber Wahrheit zerstört immer auch das Bild, das andere behalten wollten.'],
+          ['Alex','Wenn ich schweige, rette ich Ruhe. Wenn ich rede, vielleicht etwas Größeres.']
+        ],
+        choices: [
+          { label: 'A — Wahrheit öffentlich machen', hint: 'Die Schule soll alles sehen.', target: 'end_good', effect: s => { s.expose = true; } },
+          { label: 'B — Geheimnis behalten', hint: 'Du stoppst den Skandal, aber nicht die Last.', target: 'end_branch', effect: s => { s.expose = false; } }
+        ]
+      },
+      end_good: {
+        image: 12, progress: 12, title: 'Ende — Offenlegung', ending: 'Gutes Ende — Die Wahrheit kommt raus.',
+        lines: [
+          ['Erzähler','Die Daten werden veröffentlicht. Eltern, Lehrkräfte und Schüler verlangen Antworten. Die Schule kann ihre Fassade nicht länger halten.'],
+          ['Erzähler','Es wird chaotisch. Es wird laut. Aber Fairness fühlt sich zum ersten Mal wieder möglich an.'],
+          ['Alex','Vielleicht war Wahrheit nie bequem. Nur notwendig.']
+        ]
+      },
+      end_branch: {
+        image: 12, progress: 12, title: 'Ende — Schweigen',
+        dynamic: () => {
+          if (state.suspicion === 'mira' && state.trust === 'mira') {
+            return {
+              ending: 'Neutrales Ende — Nichts ändert sich.',
+              lines: [
+                ['Erzähler','Alex schweigt. Die Schule bleibt ruhig. Zu ruhig.'],
+                ['Erzähler','Zwischen ihm und Mira bleibt ein Riss, der nicht heilt.'],
+                ['Alex','Nichts ist explodiert. Aber besser ist auch nichts geworden.']
+              ]
+            };
+          }
+          return {
+            ending: 'Schlechtes Ende — Alex bekommt Probleme.',
+            lines: [
+              ['Erzähler','Das Schweigen schützt Alex nicht. Es isoliert ihn. Gerüchte wachsen, Beweise verschwinden.'],
+              ['Erzähler','Wer die Wahrheit fast ans Licht bringt, wird leicht zu dem, auf den das Licht plötzlich fällt.'],
+              ['Alex','Ich dachte, Schweigen wäre sicher. War es nie.']
+            ]
+          };
+        }
+      },
+      easter_truth: {
+        image: 5, progress: 11, title: 'Geheime Szene — Terminal Echo', ending: 'Easter Egg — Das System antwortet.',
+        lines: [
+          ['Terminal','ECHO // Zugriff erkannt.'],
+          ['Terminal','Nicht jede manipulierte Entscheidung wurde nur von Menschen getroffen. Manche Systeme lernen Schweigen.'],
+          ['Alex','Wer bist du?'],
+          ['Terminal','Vielleicht nur das Echo jeder Entscheidung, die niemand zugeben will.']
+        ]
+      }
+    };
+
+    const chapters = [
+      ['s1','Szene 1','Intro'],
+      ['s2_go','Szene 2A','Computerraum'],
+      ['s2_ignore','Szene 2B','Ignorieren'],
+      ['s4_choice','Szene 4','Erste Entscheidung'],
+      ['s6_suspicion','Szene 6','Verdacht'],
+      ['s8_truth','Szene 8','Die Struktur'],
+      ['s10_final','Szene 10','Letzte Entscheidung']
+    ];
+
+    const state = {
+      sceneId: 's1',
+      lineIndex: 0,
+      trust: null,
+      suspicion: null,
+      expose: null,
+      searched: false,
+      confronted: false,
+      secrets: new Set(),
+      history: [],
+      log: [],
+      konami: [],
+      secretClicks: 0
+    };
+
+    const el = {
+      bgA: document.getElementById('bgA'),
+      bgB: document.getElementById('bgB'),
+      titleScreen: document.getElementById('titleScreen'),
+      startBtn: document.getElementById('startBtn'),
+      openChaptersIntroBtn: document.getElementById('openChaptersIntroBtn'),
+      openLogIntroBtn: document.getElementById('openLogIntroBtn'),
+      restartIntroBtn: document.getElementById('restartIntroBtn'),
+      scenePill: document.getElementById('scenePill'),
+      routePill: document.getElementById('routePill'),
+      secretPill: document.getElementById('secretPill'),
+      sceneTitle: document.getElementById('sceneTitle'),
+      progressMeter: document.getElementById('progressMeter'),
+      speaker: document.getElementById('speaker'),
+      text: document.getElementById('text'),
+      nextBtn: document.getElementById('nextBtn'),
+      backBtn: document.getElementById('backBtn'),
+      openLogBtn: document.getElementById('openLogBtn'),
+      openChaptersBtn: document.getElementById('openChaptersBtn'),
+      endingText: document.getElementById('endingText'),
+      choices: document.getElementById('choices'),
+      restartBtn: document.getElementById('restartBtn'),
+      routeBtn: document.getElementById('routeBtn'),
+      secretBtn: document.getElementById('secretBtn'),
+      revealBtn: document.getElementById('revealBtn'),
+      codeInput: document.getElementById('codeInput'),
+      enterCodeBtn: document.getElementById('enterCodeBtn'),
+      logOverlay: document.getElementById('logOverlay'),
+      chapterOverlay: document.getElementById('chapterOverlay'),
+      logList: document.getElementById('logList'),
+      chapterList: document.getElementById('chapterList'),
+      toast: document.getElementById('toast')
+    };
+
+    let activeBg = 'A';
+
+    function cloneState() {
+      return {
+        sceneId: state.sceneId,
+        lineIndex: state.lineIndex,
+        trust: state.trust,
+        suspicion: state.suspicion,
+        expose: state.expose,
+        searched: state.searched,
+        confronted: state.confronted,
+        secrets: [...state.secrets],
+        log: state.log.slice()
+      };
+    }
+
+    function restoreState(s) {
+      state.sceneId = s.sceneId;
+      state.lineIndex = s.lineIndex;
+      state.trust = s.trust;
+      state.suspicion = s.suspicion;
+      state.expose = s.expose;
+      state.searched = s.searched;
+      state.confronted = s.confronted;
+      state.secrets = new Set(s.secrets || []);
+      state.log = (s.log || []).slice();
+    }
+
+    function getScene(id = state.sceneId) {
+      const base = scenes[id];
+      return base.dynamic ? { ...base, ...base.dynamic() } : base;
+    }
+
+    function evalPart(part) {
+      return typeof part === 'function' ? part() : part;
+    }
+
+    function getLine(scene = getScene()) {
+      const raw = scene.lines[state.lineIndex];
+      if (!raw) return null;
+      return { speaker: evalPart(raw[0]), text: evalPart(raw[1]) };
+    }
+
+    function setBg(filename) {
+      const incoming = activeBg === 'A' ? el.bgB : el.bgA;
+      const outgoing = activeBg === 'A' ? el.bgA : el.bgB;
+      incoming.style.backgroundImage = `url('${filename}')`;
+      incoming.classList.add('active');
+      outgoing.classList.remove('active');
+      activeBg = activeBg === 'A' ? 'B' : 'A';
+    }
+
+    function routeText() {
+      if (state.sceneId === 'easter_truth') return 'Route: Geheimnis';
+      if (state.expose === true) return 'Route: Offenlegung';
+      if (state.expose === false) return 'Route: Schweigen';
+      if (state.suspicion === 'mira') return 'Route: Mira';
+      if (state.suspicion === 'brenner') return 'Route: Brenner';
+      if (state.trust === 'mira') return 'Route: Mira-Vertrauen';
+      if (state.trust === 'direktor') return 'Route: Direktor';
+      return 'Route: Unbestimmt';
+    }
+
+    function updateProgress(progress) {
+      el.progressMeter.innerHTML = '';
+      for (let i = 1; i <= 12; i++) {
+        const dot = document.createElement('span');
+        if (i <= progress) dot.classList.add('active');
+        el.progressMeter.appendChild(dot);
+      }
+    }
+
+    function addLog(line, sceneTitle) {
+      const key = `${state.sceneId}-${state.lineIndex}`;
+      const last = state.log[state.log.length - 1];
+      if (last && last.key === key) return;
+      state.log.push({ key, speaker: line.speaker, text: line.text, sceneTitle });
+      if (state.log.length > 80) state.log.shift();
+    }
+
+    function renderLog() {
+      el.logList.innerHTML = '';
+      const items = state.log.slice().reverse();
+      if (!items.length) {
+        el.logList.innerHTML = '<div class="log-item"><strong>Noch kein Verlauf</strong><p>Starte das Spiel, dann erscheinen hier alle gelesenen Texte.</p></div>';
+        return;
+      }
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `<strong>${item.speaker} • ${item.sceneTitle}</strong><p>${item.text}</p>`;
+        el.logList.appendChild(div);
+      });
+    }
+
+    function renderChapters() {
+      el.chapterList.innerHTML = '';
+      chapters.forEach(([id, title, sub]) => {
+        const btn = document.createElement('button');
+        btn.className = 'chapter-btn';
+        btn.innerHTML = `<strong>${title}</strong><span>${sub}</span>`;
+        btn.addEventListener('click', () => {
+          pushHistory();
+          state.sceneId = id;
+          state.lineIndex = 0;
+          closeOverlay('chapterOverlay');
+          render();
+        });
+        el.chapterList.appendChild(btn);
+      });
+    }
+
+    function openOverlay(id) {
+      document.getElementById(id).classList.add('visible');
+      if (id === 'logOverlay') renderLog();
+      if (id === 'chapterOverlay') renderChapters();
+    }
+
+    function closeOverlay(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    function toast(text) {
+      el.toast.textContent = text;
+      el.toast.classList.add('visible');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.toast.classList.remove('visible'), 2200);
+    }
+
+    function unlockSecret(id, message) {
+      if (!state.secrets.has(id)) {
+        state.secrets.add(id);
+        toast(message);
+      }
+      el.secretPill.textContent = `Geheimnisse: ${state.secrets.size}/3`;
+    }
+
+    function pushHistory() {
+      state.history.push(cloneState());
+      if (state.history.length > 120) state.history.shift();
+    }
+
+    function renderChoices(scene) {
+      el.choices.innerHTML = '';
+      if (!scene.choices) {
+        el.choices.classList.remove('visible');
+        return;
+      }
+      scene.choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<strong>${choice.label}</strong><span>${choice.hint}</span>`;
+        btn.addEventListener('click', () => {
+          pushHistory();
+          choice.effect(state);
+          state.sceneId = choice.target;
+          state.lineIndex = 0;
+          render();
+        });
+        el.choices.appendChild(btn);
+      });
+      el.choices.classList.add('visible');
+    }
+
+    function render() {
+      const scene = getScene();
+      const line = getLine(scene);
+      setBg(imageMap[scene.image]);
+      el.scenePill.textContent = `Szene ${scene.progress || 1}`;
+      el.routePill.textContent = routeText();
+      el.secretPill.textContent = `Geheimnisse: ${state.secrets.size}/3`;
+      el.sceneTitle.textContent = scene.title;
+      el.endingText.textContent = scene.ending || 'Noch ist nichts entschieden.';
+      updateProgress(scene.progress || 1);
+      el.backBtn.disabled = state.history.length === 0;
+
+      if (line) {
+        el.speaker.textContent = line.speaker;
+        el.text.textContent = line.text;
+        addLog(line, scene.title);
+        el.nextBtn.classList.remove('hidden');
+        el.nextBtn.textContent = 'Weiter →';
+        el.choices.classList.remove('visible');
+      } else {
+        el.speaker.textContent = scene.ending ? 'Ende' : 'Entscheidung';
+        el.text.textContent = scene.ending
+          ? `${scene.ending}\n\nNutze Zurück, Log oder Kapitelwahl für einen anderen Weg.`
+          : 'Wie entscheidest du?';
+        if (scene.choices) {
+          el.nextBtn.classList.add('hidden');
+          renderChoices(scene);
+        } else {
+          el.choices.classList.remove('visible');
+          el.nextBtn.classList.remove('hidden');
+          el.nextBtn.textContent = 'Neu starten ↺';
+        }
+      }
+    }
+
+    function next() {
+      const scene = getScene();
+      if (state.lineIndex < scene.lines.length - 1) {
+        pushHistory();
+        state.lineIndex += 1;
+        render();
+        return;
+      }
+      if (scene.choices) {
+        pushHistory();
+        state.lineIndex += 1;
+        render();
+        return;
+      }
+      if (scene.next) {
+        pushHistory();
+        state.sceneId = scene.next;
+        state.lineIndex = 0;
+        render();
+        return;
+      }
+      restartGame(false);
+    }
+
+    function back() {
+      if (!state.history.length) return;
+      restoreState(state.history.pop());
+      render();
+    }
+
+    function restartGame(showTitle = true) {
+      state.sceneId = 's1';
+      state.lineIndex = 0;
+      state.trust = null;
+      state.suspicion = null;
+      state.expose = null;
+      state.searched = false;
+      state.confronted = false;
+      state.history = [];
+      state.log = [];
+      if (showTitle) el.titleScreen.classList.remove('hidden');
+      render();
+    }
+
+    function startGame() {
+      el.titleScreen.classList.add('hidden');
+      render();
+    }
+
+    function runCode() {
+      const code = el.codeInput.value.trim().toUpperCase();
+      if (!code) return;
+      if (code === 'ECHO') {
+        unlockSecret('echo','Geheimnis gefunden: Terminal Echo.');
+        pushHistory();
+        state.sceneId = 'easter_truth';
+        state.lineIndex = 0;
+        render();
+        return;
+      }
+      if (code === 'WAHRHEIT') {
+        unlockSecret('truth','Geheimnis gefunden: Wahrheitsschimmer.');
+        document.body.style.filter = 'brightness(1.04) saturate(1.06)';
+        setTimeout(() => document.body.style.filter = '', 900);
+        return;
+      }
+      if (code === 'MIRA') {
+        unlockSecret('mira','Geheimnis gefunden: Miras Echo.');
+        return;
+      }
+      toast('Kein bekannter Code.');
+    }
+
+    function handleKonami(key) {
+      const target = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+      state.konami.push(key.length === 1 ? key.toLowerCase() : key);
+      state.konami = state.konami.slice(-10);
+      const ok = target.every((v, i) => state.konami[i] === v);
+      if (ok) unlockSecret('konami','Geheimnis gefunden: Konami-Code.');
+    }
+
+    el.startBtn.addEventListener('click', startGame);
+    el.openChaptersIntroBtn.addEventListener('click', () => openOverlay('chapterOverlay'));
+    el.openLogIntroBtn.addEventListener('click', () => openOverlay('logOverlay'));
+    el.restartIntroBtn.addEventListener('click', () => restartGame(true));
+    el.nextBtn.addEventListener('click', next);
+    el.backBtn.addEventListener('click', back);
+    el.openLogBtn.addEventListener('click', () => openOverlay('logOverlay'));
+    el.openChaptersBtn.addEventListener('click', () => openOverlay('chapterOverlay'));
+    el.restartBtn.addEventListener('click', () => restartGame(true));
+    el.routeBtn.addEventListener('click', () => toast(routeText()));
+    el.secretBtn.addEventListener('click', () => {
+      state.secretClicks += 1;
+      if (state.secretClicks >= 5) {
+        unlockSecret('clicks','Geheimnis gefunden: Versteckter Klick-Trigger.');
+        state.secretClicks = 0;
+      } else {
+        toast(`Verdächtiger Button. Klicks: ${state.secretClicks}/5`);
+      }
+    });
+    el.revealBtn.addEventListener('click', () => toast('Tipp: Probiere ECHO, WAHRHEIT oder MIRA.'));
+    el.enterCodeBtn.addEventListener('click', runCode);
+    el.codeInput.addEventListener('keydown', e => { if (e.key === 'Enter') runCode(); });
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => closeOverlay(btn.dataset.close));
+    });
+
+    document.addEventListener('keydown', e => {
+      handleKonami(e.key);
+      if (e.key === ' ' || e.key === 'Enter') {
+        if (!el.titleScreen.classList.contains('hidden')) return;
+        e.preventDefault();
+        next();
+      }
+      if (e.key === 'Backspace') {
+        if (!el.titleScreen.classList.contains('hidden')) return;
+        e.preventDefault();
+        back();
+      }
+      if (e.key.toLowerCase() === 'l') openOverlay('logOverlay');
+      if (e.key.toLowerCase() === 'k') openOverlay('chapterOverlay');
+      if (e.key.toLowerCase() === 'r') restartGame(true);
+      if (e.key === 'Escape') {
+        closeOverlay('logOverlay');
+        closeOverlay('chapterOverlay');
+      }
+    });
+
+    el.logOverlay.addEventListener('click', e => { if (e.target === el.logOverlay) closeOverlay('logOverlay'); });
+    el.chapterOverlay.addEventListener('click', e => { if (e.target === el.chapterOverlay) closeOverlay('chapterOverlay'); });
+
+    setBg(imageMap[1]);
+    render();
+  </script>
+</body>
+</html>
