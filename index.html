@@ -46,7 +46,9 @@
       font-family: var(--font-body);
       background: var(--color-bg);
       color: var(--color-text);
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     button, input { font: inherit; }
@@ -62,7 +64,8 @@
     .app {
       position: relative;
       min-height: 100dvh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       background: #05070c;
     }
 
@@ -223,7 +226,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: var(--space-5);
+      padding: calc(var(--space-12) + 1rem) var(--space-5) var(--space-5);
     }
 
     .stage {
@@ -469,11 +472,21 @@
     }
 
     @media (max-width: 720px) {
-      .topbar, .content { padding: var(--space-4); }
+      body { overflow-y: auto; }
+      .topbar { padding: var(--space-4); }
+      .content { padding: calc(var(--space-12) + 2.5rem) var(--space-4) var(--space-4); min-height: auto; }
+      .status-row { align-items: flex-start; }
+      .dialogue-box { padding: 1rem; }
+      .text { min-height: auto; line-height: 1.75; }
+      .meta { flex-direction: column; align-items: stretch; }
+      .button-row { display: grid; grid-template-columns: 1fr 1fr; }
+      .button-row .ui-btn { width: 100%; }
       .side { grid-template-columns: 1fr; }
       .button-row .ui-btn, .quick-grid .ui-btn { flex: 1 1 auto; }
       .quick-grid { grid-template-columns: 1fr 1fr; }
-      .toast { left: var(--space-4); right: var(--space-4); max-width: none; }
+      .toast { left: var(--space-4); right: var(--space-4); max-width: none; bottom: var(--space-4); }
+      .title-card { max-height: calc(100dvh - 2rem); overflow: auto; }
+      .overlay-card { max-height: 88dvh; }
     }
   </style>
 </head>
