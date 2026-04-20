@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Echo der Entscheidung</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,12 +88,15 @@
         radial-gradient(circle at 18% 15%, rgba(140,183,255,.16), transparent 28%),
         radial-gradient(circle at 82% 16%, rgba(255,225,156,.08), transparent 26%);
       pointer-events: none;
+      background: linear-gradient(180deg, rgba(5,7,11,.82), rgba(5,7,11,.32), transparent);
       z-index: 1;
     }
 
     .topbar {
-      position: absolute;
-      inset: 0 0 auto 0;
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 5;
       display: flex;
       justify-content: space-between;
@@ -101,6 +104,7 @@
       padding: var(--space-5);
       flex-wrap: wrap;
       pointer-events: none;
+      background: linear-gradient(180deg, rgba(5,7,11,.82), rgba(5,7,11,.32), transparent);
     }
 
     .glass {
@@ -450,6 +454,7 @@
       transform: translateY(10px);
       transition: opacity .25s ease, transform .25s ease;
       pointer-events: none;
+      background: linear-gradient(180deg, rgba(5,7,11,.82), rgba(5,7,11,.32), transparent);
     }
     .toast.visible { opacity: 1; transform: translateY(0); }
 
@@ -524,6 +529,54 @@
       .title-card { text-align: left; }
       .subtitle { margin-inline: 0; }
       .footer { font-size: .74rem; }
+    }
+
+
+    @media (max-width: 720px) {
+      html { overflow-y: auto; }
+      body { min-height: 100%; }
+      .overlay-bg { background: linear-gradient(180deg, rgba(6,8,12,.14) 0%, rgba(6,8,12,.26) 36%, rgba(6,8,12,.76) 100%); }
+      .content { padding-top: .75rem; }
+      .speaker { justify-self: start; }
+      .dialogue-col { position: relative; }
+      .dialogue-box { background: rgba(9, 12, 18, .88); }
+      .meta { gap: .85rem; }
+      .button-row { gap: .6rem; }
+      .choice-btn strong { font-size: .96rem; }
+      .choice-btn span { font-size: .92rem; }
+      .panel input { font-size: 16px; }
+    }
+
+    @media (max-width: 520px) {
+      .app { min-height: auto; }
+      .bg { position: fixed; inset: 0; }
+      .topbar { gap: .65rem; padding-bottom: .5rem; }
+      .glass { width: 100%; justify-content: center; }
+      .brand-title { text-align: center; }
+      .hud { grid-template-columns: 1fr; }
+      .content { padding: .5rem .85rem 1rem; }
+      .stage { width: 100%; }
+      .shell { grid-template-columns: 1fr; align-items: start; }
+      .dialogue-col { order: 1; }
+      .side { order: 2; }
+      .speaker { margin-top: .2rem; }
+      .dialogue-box { padding: .95rem; }
+      .text { font-size: .98rem; max-width: 100%; }
+      .button-row { grid-template-columns: 1fr 1fr; }
+      .choice-list.visible { display: grid; grid-template-columns: 1fr; }
+      .choice-btn { min-height: 88px; }
+      .panel { box-shadow: 0 10px 24px rgba(0,0,0,.22); }
+      .footer { display: grid; gap: .4rem; }
+    }
+
+    @media (max-width: 390px) {
+      h1 { font-size: 2.5rem; }
+      .subtitle { font-size: .98rem; }
+      .button-row { grid-template-columns: 1fr; }
+      .quick-grid { grid-template-columns: 1fr; }
+      .topbar { padding: .7rem; }
+      .content { padding: .35rem .7rem 1rem; }
+      .panel, .dialogue-box, .title-card { border-radius: .95rem; }
     }
 
   </style>
